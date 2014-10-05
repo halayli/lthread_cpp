@@ -92,8 +92,8 @@ class Lthread
   explicit Lthread(_Callable&& __f, _Args&&... __args)
   {
 
-    LthreadStart(LthreadMakeRoutine(std::__bind_simple(std::forward<_Callable>(__f),
-                                                       std::forward<_Args>(__args)...)));
+    LthreadStart(LthreadMakeRoutine(std::bind(std::forward<_Callable>(__f),
+                                              std::forward<_Args>(__args)...)));
   }
 
   template<typename _Callable>
