@@ -12,8 +12,6 @@ namespace lthread_cpp {
 namespace net {
 
 class Socket;
-class TcpListener;
-
 class SSLSocket : public Socket {
  public:
   SSLSocket(Socket&& s);
@@ -22,7 +20,6 @@ class SSLSocket : public Socket {
   size_t Recv(char* buf, size_t length, int timeout_ms=1000);
   void Close();
 
-  static void Init();
   static void Init(const std::string& pem_file, const std::string& key_file);
 
   inline SSLSocket(SSLSocket&& old_s)
@@ -46,13 +43,13 @@ class SSLSocket : public Socket {
     return *this;
   }
 
+  void Accept(int timeout_ms=5000);
+
  private:
   SSLSocket(const SSLSocket&);
   SSLSocket& operator=(const SSLSocket&);
-  int Accept(int timeout_ms=1000) const; // called by TcpListener::SSLAccept();
   Socket   sock_;
   SSL*     ssl_;
-  friend class TcpListener;
 };
 
 }
