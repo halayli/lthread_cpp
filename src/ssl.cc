@@ -8,6 +8,17 @@ static SSL_CTX* g_ctx = nullptr;
 
 using namespace lthread_cpp::net;
 
+SSLException::SSLException(const char* message)
+  : SocketException("")
+{
+ long ret = ERR_get_error();
+ char* tmp = ERR_error_string(ret, nullptr);
+
+ msg_ = message;
+ msg_ += ": ";
+ msg_ += tmp;
+}
+
 void SSLSocket::Init(const std::string& pem_f, const std::string& key_f)
 {
   SSL_load_error_strings();
@@ -15,7 +26,7 @@ void SSLSocket::Init(const std::string& pem_f, const std::string& key_f)
   const SSL_METHOD* meth = SSLv23_server_method();
   g_ctx = SSL_CTX_new (meth);
   if (!g_ctx)
-    throw SSLException("Failed to initialize SSL context")
+    throw SSLException("Failed to initialize SSL context");
 
   if (SSL_CTX_use_certificate_file(g_ctx, pem_f.c_str(), SSL_FILETYPE_PEM) <= 0)
     throw SSLException("Failed to use pem file");
@@ -39,7 +50,7 @@ void SSLSocket::Accept(int timeout_ms)
     else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
       sock_.WaitWrite(timeout_ms);
     else
-      throw SSLException("Accept failed");
+      throw SSLException("SSL_accept failed");
   }
 }
 

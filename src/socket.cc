@@ -49,11 +49,11 @@ Socket lthread_cpp::net::TcpConnect(const std::string& host_or_ip,
 
   if (lthread_connect(fd, base->ai_addr, base->ai_addrlen, timeout_ms) < 0) {
     close(fd);
+    freeaddrinfo(base);
     throw SocketException("Failed to connect to: %s:%d", host_or_ip.c_str(), port);
   }
 
-  if (base)
-    freeaddrinfo(base);
+  freeaddrinfo(base);
 
   return Socket(fd);
 }

@@ -108,50 +108,6 @@ class SocketTimeout : public SocketException {
   explicit SocketTimeout(): SocketException("") {}
 };
 
-class SSLSocket;
-class TcpListener {
- public:
-  TcpListener(const std::string& ip, short port);
-  ~TcpListener() { Close(); }
-  Socket Accept(int timeout_ms=1000);
-  SSLSocket SSLAccept(int timeout_ms=1000);
-  void Listen();
-  void Close();
-
- private:
-  int fd_;
-  std::string ip_;
-  short port_;
-};
-
-class SocketProxy {
- public:
-  SocketProxy(Socket* client, Socket* server)
-  {
-    client_ = client;// = std::move(client);
-    server_ = server;
-    //server_ = std::move(server);
-    keep_running_ = true;
-  }
-  ~SocketProxy();
-
-  // starting point after a connection is accepted
-  void Run();
-  void RecvFromClient();
-
- private:
-  void RecvFromServer();
-  void SendRecv(Socket* client, Socket* server);
-
-  Lthread server_thread_;
-  Lthread client_thread_;
-
-  Socket* client_;
-  Socket* server_;
-
-  bool keep_running_;
-};
-
 }
 }
 

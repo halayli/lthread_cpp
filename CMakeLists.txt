@@ -4,7 +4,9 @@ SET(CMAKE_BUILD_TYPE release)
 SET (CMAKE_C_FLAGS_RELEASE "-Werror -g -Wall")
 
 include_directories(/usr/local/include include)
-set(lthread_files src/socket.cc src/lthread.cc src/ssl.cc)
+set(lthread_files src/socket.cc src/lthread.cc src/ssl.cc
+    src/proxy.cc src/listener.cc)
+
 add_library(lthread_cpp ${lthread_files})
 set_target_properties(lthread_cpp PROPERTIES COMPILE_FLAGS "-std=c++11")
 target_link_libraries(lthread_cpp pthread lthread ssl crypto)

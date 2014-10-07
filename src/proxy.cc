@@ -1,4 +1,7 @@
+#include "lthread_cpp/proxy.h"
 
+
+using namespace lthread_cpp::net;
 SocketProxy::~SocketProxy()
 {
   client_->Close();

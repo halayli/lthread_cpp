@@ -12,6 +12,7 @@ namespace lthread_cpp {
 namespace net {
 
 class Socket;
+class SocketException;
 class SSLSocket : public Socket {
  public:
   SSLSocket(Socket&& s);
@@ -22,6 +23,7 @@ class SSLSocket : public Socket {
 
   static void Init(const std::string& pem_file, const std::string& key_file);
 
+  SSLSocket() : ssl_(nullptr) {}
   inline SSLSocket(SSLSocket&& old_s)
   {
     sock_ = std::move(old_s.sock_);
@@ -30,13 +32,14 @@ class SSLSocket : public Socket {
     old_s.ssl_ = nullptr;
   }
 
+  int fd() const { return sock_.fd(); }
   inline SSLSocket& operator=(SSLSocket&& rr_c)
   {
     // close current connection if we have one, new connection assigned will
     // take over. Same thing for above.
-    if (rr_c.fd() != -1 && sock_.fd() != rr_c.fd())
+    if (sock_.fd() != -1 && sock_.fd() != rr_c.fd())
       Close();
-    sock_ = std::move(rr_c);
+    sock_ = std::move(rr_c.sock_);
     ssl_ = rr_c.ssl_;
     rr_c.ssl_ = nullptr;
 
@@ -45,11 +48,18 @@ class SSLSocket : public Socket {
 
   void Accept(int timeout_ms=5000);
 
+  Socket   sock_;
  private:
   SSLSocket(const SSLSocket&);
   SSLSocket& operator=(const SSLSocket&);
-  Socket   sock_;
   SSL*     ssl_;
+};
+
+class SSLException : public SocketException {
+ public:
+  virtual ~SSLException() throw () {}
+  explicit SSLException(const char* message);
+  explicit SSLException(): SocketException("") {}
 };
 
 }

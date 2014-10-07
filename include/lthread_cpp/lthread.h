@@ -120,6 +120,8 @@ class Lthread
   Lthread(const Lthread&) = delete;
   Lthread& operator=(const Lthread&) = delete;
 
+  static void Run() { lthread_run(); }
+
   ~Lthread()
   {
     if (Joinable())
