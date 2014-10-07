@@ -71,8 +71,11 @@ size_t SSLSocket::Send(const char* buf, size_t length, int timeout_ms)
     int ret = SSL_write(ssl_, buf, length);
     if (ret > 0)
       return ret;
-    else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
+
+    if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
       sock_.WaitWrite(timeout_ms);
+    else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_READ)
+      sock_.WaitRead(timeout_ms);
     else
       throw SSLException("SSL_write failed");
   }
@@ -90,6 +93,7 @@ size_t SSLSocket::Recv(char* buf, size_t length, int timeout_ms)
     int ret = SSL_read(ssl_, buf, length);
     if (ret > 0)
       return ret;
+
     if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_READ)
       sock_.WaitRead(timeout_ms);
     else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
