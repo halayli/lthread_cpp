@@ -1,5 +1,5 @@
-#ifndef LTHREAD_SOCKET_H
-#define LTHREAD_SOCKET_H
+#ifndef LTHREAD_CPP_SOCKET_H
+#define LTHREAD_CPP_SOCKET_H
 
 #include <sys/socket.h>
 #include <errno.h>
@@ -17,18 +17,22 @@ namespace net {
 
 class TcpListener;
 class Socket;
+
 Socket TcpConnect(const std::string& host_or_ip,
                   short port,
                   int timeout_ms=1000);
 
+
 class Socket {
  public:
-  size_t Send(const char* buf);
-  size_t Send(const char* buf, size_t length);
-  size_t Recv(char* buf, size_t length, int timeout_ms=1000);
+  virtual size_t Send(const char* buf, int timeout_ms=1000);
+  virtual size_t Send(const char* buf, size_t length, int timeout_ms=1000);
+  virtual size_t Recv(char* buf, size_t length, int timeout_ms=1000);
+  virtual void Close();
   size_t Writev(struct iovec* v, int iovcnt);
   size_t RecvExact(char* buf, size_t length, int timeout_ms=1000);
-  void Close();
+  void WaitWrite(int timeout_ms=1000) const;
+  void WaitRead(int timeout_ms=1000) const;
 
   ~Socket();
   Socket() : fd_(-1) {}
@@ -58,11 +62,10 @@ class Socket {
   Socket(const Socket&) = delete;
   Socket& operator=(const Socket&) = delete;
 
-  bool is_connected() const { return fd_ > -1; }
+  bool IsConnected() const { return fd_ > -1; }
+  int fd() const { return fd_; }
 
  private:
-
-  int fd() const { return fd_; }
   Socket(int fd);
   Socket(int fd, struct sockaddr* addr, socklen_t* addrlen);
   int fd_;
@@ -102,13 +105,16 @@ class SocketTimeout : public SocketException {
  public:
   virtual ~SocketTimeout() throw () {}
   explicit SocketTimeout(const char* message): SocketException(message) {}
+  explicit SocketTimeout(): SocketException("") {}
 };
 
+class SSLSocket;
 class TcpListener {
  public:
   TcpListener(const std::string& ip, short port);
   ~TcpListener() { Close(); }
   Socket Accept(int timeout_ms=1000);
+  SSLSocket SSLAccept(int timeout_ms=1000);
   void Listen();
   void Close();
 
@@ -120,10 +126,11 @@ class TcpListener {
 
 class SocketProxy {
  public:
-  SocketProxy(Socket client, Socket server)
+  SocketProxy(Socket* client, Socket* server)
   {
-    client_ = std::move(client);
-    server_ = std::move(server);
+    client_ = client;// = std::move(client);
+    server_ = server;
+    //server_ = std::move(server);
     keep_running_ = true;
   }
   ~SocketProxy();
@@ -134,13 +141,13 @@ class SocketProxy {
 
  private:
   void RecvFromServer();
-  void SendRecv(Socket& client, Socket& server);
+  void SendRecv(Socket* client, Socket* server);
 
   Lthread server_thread_;
   Lthread client_thread_;
 
-  Socket client_;
-  Socket server_;
+  Socket* client_;
+  Socket* server_;
 
   bool keep_running_;
 };

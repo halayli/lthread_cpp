@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "lthread_cpp/socket.h"
+#include "lthread_cpp/ssl.h"
 
 using namespace lthread_cpp::net;
 
@@ -74,6 +75,15 @@ Socket TcpListener::Accept(int timeout_ms)
   return Socket(cli_fd, &peer_addr, &addrlen);
 }
 
+SSLSocket TcpListener::SSLAccept(int timeout_ms)
+{
+  Socket s = Accept(timeout_ms);
+  SSLSocket ssl_sock(std::move(s));
+  ssl_sock.Accept(timeout_ms);
+
+  return ssl_sock;
+}
+
 void TcpListener::Listen()
 {
   int ret = 0;
@@ -122,12 +132,12 @@ Socket::Socket(int fd) : fd_(fd), addrlen_(0) {}
 Socket::Socket(int fd, struct sockaddr* addr, socklen_t* addrlen) :
   fd_(fd), addr_(*addr), addrlen_(*addrlen) {}
 
-size_t Socket::Send(const char* buf)
+size_t Socket::Send(const char* buf, int timeout_ms)
 {
-  return Send(buf, strlen(buf));
+  return Send(buf, strlen(buf), timeout_ms);
 }
 
-size_t Socket::Send(const char* buf, size_t length)
+size_t Socket::Send(const char* buf, size_t length, int timeout_ms)
 {
   ssize_t r = lthread_write(fd_, buf, length);
   if (r == -1)
@@ -170,6 +180,24 @@ size_t Socket::Recv(char* buf, size_t length, int timeout_ms)
   return (size_t)r;
 }
 
+void Socket::WaitRead(int timeout_ms) const
+{
+  int ret = lthread_wait_read(fd_, timeout_ms);
+  if (ret == -2)
+    throw SocketTimeout();
+  if (ret == -1)
+    throw SocketException("Peer closed: %s", strerror(errno));
+}
+
+void Socket::WaitWrite(int timeout_ms) const
+{
+  int ret = lthread_wait_write(fd_, timeout_ms);
+  if (ret == -2)
+    throw SocketTimeout();
+  if (ret == -1)
+    throw SocketException("Peer closed: %s", strerror(errno));
+}
+
 void Socket::Close()
 {
   if (fd_ != -1) {
@@ -185,8 +213,8 @@ Socket::~Socket()
 
 SocketProxy::~SocketProxy()
 {
-  client_.Close();
-  server_.Close();
+  client_->Close();
+  server_->Close();
 }
 
 void SocketProxy::Run()
@@ -208,14 +236,14 @@ void SocketProxy::RecvFromServer()
   SendRecv(server_, client_);
 }
 
-void SocketProxy::SendRecv(Socket& client, Socket& server)
+void SocketProxy::SendRecv(Socket* client, Socket* server)
 {
   while(keep_running_)
   {
     char buf[1024];
     try {
-      size_t sz = client.Recv(buf, 1024, 5000);
-      server.Send(buf, sz);
+      size_t sz = client->Recv(buf, 1024, 5000);
+      server->Send(buf, sz);
     } catch (SocketTimeout& e) {
       continue;
     } catch (SocketException& e) {
