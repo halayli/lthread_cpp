@@ -23,12 +23,17 @@ class SSLSocket : public Socket {
 
   static void Init(const std::string& pem_file, const std::string& key_file);
 
-  SSLSocket() : ssl_(nullptr) {}
+  SSLSocket() : ssl_(nullptr), cert_(nullptr), peer_verification_(false) {}
+
   inline SSLSocket(SSLSocket&& old_s)
   {
     sock_ = std::move(old_s.sock_);
     ssl_ = old_s.ssl_;
+    cert_ = old_s.cert_;
+    peer_verification_ = old_s.peer_verification_;
 
+    old_s.peer_verification_ = false;
+    old_s.cert_ = nullptr;
     old_s.ssl_ = nullptr;
   }
 
@@ -41,6 +46,11 @@ class SSLSocket : public Socket {
       Close();
     sock_ = std::move(rr_c.sock_);
     ssl_ = rr_c.ssl_;
+    cert_ = rr_c.cert_;
+    peer_verification_ = rr_c.peer_verification_;
+
+    rr_c.peer_verification_ = false;
+    rr_c.cert_ = nullptr;
     rr_c.ssl_ = nullptr;
 
     return *this;
@@ -48,11 +58,21 @@ class SSLSocket : public Socket {
 
   void Accept(int timeout_ms=5000);
 
-  Socket   sock_;
+  void RequirePeerVerification();
+  /*
+  std::string GetCertSubject();
+  std::string GetCertEmail();
+  std::string GetCertCommonName();
+  */
+
  private:
   SSLSocket(const SSLSocket&);
   SSLSocket& operator=(const SSLSocket&);
-  SSL*     ssl_;
+
+  Socket sock_;
+  SSL* ssl_;
+  X509* cert_;
+  bool peer_verification_;
 };
 
 class SSLException : public SocketException {

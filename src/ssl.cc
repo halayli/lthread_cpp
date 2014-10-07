@@ -38,13 +38,19 @@ void SSLSocket::Init(const std::string& pem_f, const std::string& key_f)
     throw SSLException("Private key does not match the certificate public key");
 }
 
+void SSLSocket::RequirePeerVerification()
+{
+  SSL_set_verify(ssl_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
+  peer_verification_ = true;
+}
+
 void SSLSocket::Accept(int timeout_ms)
 {
   while (1)
   {
     int ret = SSL_accept(ssl_);
     if (ret == 1)
-      return;
+      break;
     if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_READ)
       sock_.WaitRead(timeout_ms);
     else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
@@ -52,6 +58,9 @@ void SSLSocket::Accept(int timeout_ms)
     else
       throw SSLException("SSL_accept failed");
   }
+
+  if (peer_verification_)
+    cert_ = SSL_get_peer_certificate(ssl_);
 }
 
 SSLSocket::SSLSocket(Socket&& s)
@@ -105,6 +114,12 @@ size_t SSLSocket::Recv(char* buf, size_t length, int timeout_ms)
 
 void SSLSocket::Close()
 {
-  if (ssl_)
+  if (ssl_) {
+    SSL_shutdown(ssl_);
     SSL_free(ssl_);
+    if (cert_)
+      X509_free(cert_);
+    cert_ = nullptr;
+    ssl_ = nullptr;
+  }
 }
