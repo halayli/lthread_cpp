@@ -19,11 +19,15 @@ SSLException::SSLException(const char* message)
  msg_ += tmp;
 }
 
-int test(int, X509_STORE_CTX *)
+int pass_through_verify(int preverify_ok, X509_STORE_CTX * ctx)
 {
-  return 1;
+  return preverify_ok;
 }
-void SSLSocket::Init(const std::string& pem_f, const std::string& key_f)
+
+void SSLSocket::Init(const std::string& server_pem_filename,
+                     const std::string& server_key_filename,
+                     const std::string& ca_cert_filename,
+                     const std::string& ca_path)
 {
   SSL_load_error_strings();
   SSLeay_add_ssl_algorithms();
@@ -32,22 +36,26 @@ void SSLSocket::Init(const std::string& pem_f, const std::string& key_f)
   if (!g_ctx)
     throw SSLException("Failed to initialize SSL context");
 
-  if (SSL_CTX_use_certificate_chain_file(g_ctx, "ca.pem") <= 0)
-    throw SSLException("Failed to use CA file");
-
-  if (SSL_CTX_use_certificate_file(g_ctx, pem_f.c_str(), SSL_FILETYPE_PEM) <= 0)
+  if (SSL_CTX_use_certificate_file(g_ctx,
+        server_pem_filename.c_str(), SSL_FILETYPE_PEM) <= 0)
     throw SSLException("Failed to use pem file");
 
-  if (SSL_CTX_use_PrivateKey_file(g_ctx, key_f.c_str(), SSL_FILETYPE_PEM) <= 0)
+  if (SSL_CTX_use_PrivateKey_file(g_ctx,
+        server_key_filename.c_str(), SSL_FILETYPE_PEM) <= 0)
     throw SSLException("Failed to use private key file");
 
   if (!SSL_CTX_check_private_key(g_ctx))
     throw SSLException("Private key does not match the certificate public key");
+
+  if (!SSL_CTX_load_verify_locations(g_ctx, ca_cert_filename.c_str(),
+          ca_path.length() ? ca_path.c_str() : nullptr))
+    throw SSLException("Failed to load CA certificate");
 }
 
 void SSLSocket::RequirePeerVerification()
 {
-  SSL_set_verify(ssl_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, test);
+  SSL_set_verify(ssl_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+                 pass_through_verify);
   peer_verification_ = true;
 }
 

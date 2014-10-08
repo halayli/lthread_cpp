@@ -21,7 +21,10 @@ class SSLSocket : public Socket {
   size_t Recv(char* buf, size_t length, int timeout_ms=1000);
   void Close();
 
-  static void Init(const std::string& pem_file, const std::string& key_file);
+  static void Init(const std::string& server_pem_filename,
+                   const std::string& server_key_filename,
+                   const std::string& ca_cert_filename,
+                   const std::string& ca_path);
 
   SSLSocket() : ssl_(nullptr), cert_(nullptr), peer_verification_(false) {}
 
