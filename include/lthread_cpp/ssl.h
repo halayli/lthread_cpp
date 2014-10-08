@@ -59,10 +59,10 @@ class SSLSocket : public Socket {
   void Accept(int timeout_ms=5000);
 
   void RequirePeerVerification();
-  std::string GetCertCommonNameFromSubject();
-  std::string GetCertEntryFromSubject(const std::string& entry_name);
+  std::string GetCertCommonName();
 
  private:
+  std::string GetCertEntryFromSubject(const std::string& entry_name);
   SSLSocket(const SSLSocket&);
   SSLSocket& operator=(const SSLSocket&);
 

@@ -66,16 +66,12 @@ void SSLSocket::Accept(int timeout_ms)
       throw SSLException("SSL_accept failed");
   }
 
-  if (peer_verification_) {
-    printf("getting cert\n");
+  if (peer_verification_)
     cert_ = SSL_get_peer_certificate(ssl_);
-
-  }
 }
 
-std::string SSLSocket::GetCertCommonNameFromSubject()
+std::string SSLSocket::GetCertCommonName()
 {
-  printf("cert_ is %s\n", cert_);
   if (!cert_)
     return "";
 
@@ -86,19 +82,14 @@ std::string SSLSocket::GetCertEntryFromSubject(const std::string& entry_name)
 {
   X509_NAME *subject_name = X509_get_subject_name(cert_);
   if (subject_name) {
-    printf("got subject_name\n");
     int nid = OBJ_txt2nid(entry_name.c_str());
     int index = X509_NAME_get_index_by_NID(subject_name, nid, -1);
     X509_NAME_ENTRY *entry = X509_NAME_get_entry(subject_name, index);
     if (entry) {
-      printf("got entry\n");
       ASN1_STRING *entry_asn1 = X509_NAME_ENTRY_get_data(entry);
       if (entry_asn1)
         return std::string((char*)ASN1_STRING_data(entry_asn1));
     }
-  } else {
-    printf("no subject in cert\n");
-
   }
 
   return "";
