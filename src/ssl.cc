@@ -116,10 +116,9 @@ std::string SSLSocket::GetCertEntryFromSubject(const std::string& entry_name)
         return std::string((char*)ASN1_STRING_data(entry_asn1));
     }
   }
-
   return "";
-
 }
+
 SSLSocket::SSLSocket(Socket&& s)
 {
   ssl_ = SSL_new(g_ctx);
@@ -132,8 +131,7 @@ SSLSocket::SSLSocket(Socket&& s)
 
 size_t SSLSocket::Send(const char* buf, size_t length, int timeout_ms)
 {
-  while (1)
-  {
+  while (1) {
     int ret = SSL_write(ssl_, buf, length);
     if (ret > 0)
       return ret;
@@ -154,8 +152,7 @@ size_t SSLSocket::Send(const char* buf, int timeout_ms)
 
 size_t SSLSocket::Recv(char* buf, size_t length, int timeout_ms)
 {
-  while (1)
-  {
+  while (1) {
     int ret = SSL_read(ssl_, buf, length);
     if (ret > 0)
       return ret;
