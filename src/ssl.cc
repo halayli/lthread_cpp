@@ -59,6 +59,23 @@ void SSLSocket::RequirePeerVerification()
   peer_verification_ = true;
 }
 
+void SSLSocket::Connect(const std::string& host, short port, int timeout_ms)
+{
+
+  sock_ = TcpConnect(host, port, timeout_ms);
+  int ret = SSL_connect(ssl_);
+  while (1) {
+    if (ret == 1)
+      break;
+    if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_READ)
+      sock_.WaitRead(timeout_ms);
+    else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
+      sock_.WaitWrite(timeout_ms);
+    else
+      throw SSLException("SSL_connect failed");
+  }
+}
+
 void SSLSocket::Accept(int timeout_ms)
 {
   while (1)

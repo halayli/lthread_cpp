@@ -60,6 +60,7 @@ class SSLSocket : public Socket {
   }
 
   void Accept(int timeout_ms=5000);
+  void Connect(const std::string& host_or_ip, short port, int timeout_ms);
 
   void RequirePeerVerification();
   std::string GetCertCommonName();

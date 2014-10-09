@@ -5,7 +5,7 @@ SET (CMAKE_C_FLAGS_RELEASE "-Werror -g -Wall")
 
 include_directories(/usr/local/include include)
 set(lthread_files src/socket.cc src/lthread.cc src/ssl.cc
-    src/proxy.cc src/listener.cc)
+    src/proxy.cc src/listener.cc src/shell.cc)
 
 add_library(lthread_cpp ${lthread_files})
 set_target_properties(lthread_cpp PROPERTIES COMPILE_FLAGS "-std=c++11")
