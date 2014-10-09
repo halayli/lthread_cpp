@@ -32,7 +32,7 @@ void SSLSocket::Init(const std::string& server_pem_filename,
   SSL_load_error_strings();
   SSLeay_add_ssl_algorithms();
   const SSL_METHOD* meth = SSLv23_server_method();
-  g_ctx = SSL_CTX_new (meth);
+  g_ctx = SSL_CTX_new(meth);
   if (!g_ctx)
     throw SSLException("Failed to initialize SSL context");
 
@@ -125,7 +125,9 @@ SSLSocket::SSLSocket(Socket&& s)
   if (!ssl_)
     throw SSLException("Failed to create ssl object");
 
-  SSL_set_fd (ssl_, s.fd());
+  SSL_set_fd(ssl_, s.fd());
+  // disable SSLv2
+  SSL_set_options(ssl_, SSL_OP_NO_SSLv2);
   sock_ = std::move(s);
 }
 
@@ -169,7 +171,17 @@ size_t SSLSocket::Recv(char* buf, size_t length, int timeout_ms)
 void SSLSocket::Close()
 {
   if (ssl_) {
-    SSL_shutdown(ssl_);
+    while (1) {
+      int ret = SSL_shutdown(ssl_);
+      if (ret)
+        break;
+      if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_WRITE)
+        sock_.WaitWrite(0);
+      else if (ret < 0 && SSL_get_error(ssl_, ret) == SSL_ERROR_WANT_READ)
+        sock_.WaitRead(0);
+      else
+        break;
+    }
     SSL_free(ssl_);
     if (cert_)
       X509_free(cert_);
