@@ -68,6 +68,17 @@ size_t Socket::Send(const char* buf, int timeout_ms)
   return Send(buf, strlen(buf), timeout_ms);
 }
 
+std::string Socket::Desc() const
+{
+  auto addr_info = (const struct sockaddr_in*)(&addr_);
+  char* tmp = inet_ntoa(addr_info->sin_addr);
+  unsigned short port = htons(addr_info->sin_port);
+
+  std::stringstream s;
+  s << tmp << ":" << port;
+  return s.str();
+}
+
 size_t Socket::Send(const char* buf, size_t length, int timeout_ms)
 {
   ssize_t r = lthread_write(fd_, buf, length);
