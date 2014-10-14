@@ -16,8 +16,8 @@ class SocketProxy {
   }
   ~SocketProxy();
 
-  // starting point after a connection is accepted
-  void Run();
+  // starting point after a tcp connection is accepted
+  void Run(const bool* shutdown);
 
  private:
   void RecvFromClient();
@@ -31,6 +31,7 @@ class SocketProxy {
   Socket* server_;
 
   bool keep_running_;
+  const bool* shutdown_;
 };
 
 }
