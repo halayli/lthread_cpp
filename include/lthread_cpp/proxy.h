@@ -20,7 +20,7 @@ class SocketProxy {
   ~SocketProxy();
 
   // starting point after a tcp connection is accepted
-  void Run(const bool* shutdown);
+  void Run(std::function<bool()>shutdown);
 
   using OnDataCallback = std::function<void(const char*, size_t)>;
 
@@ -51,7 +51,7 @@ class SocketProxy {
   std::vector<OnDataCallback> on_server_send_;
 
   bool keep_running_;
-  const bool* shutdown_;
+  std::function<bool()> shutdown_;
 };
 
 }

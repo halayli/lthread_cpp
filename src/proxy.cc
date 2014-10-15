@@ -8,7 +8,7 @@ SocketProxy::~SocketProxy()
   server_->Close();
 }
 
-void SocketProxy::Run(const bool* shutdown)
+void SocketProxy::Run(std::function<bool()>shutdown)
 {
   shutdown_ = shutdown;
   client_thread_ = Lthread{&SocketProxy::RecvFromClient, this};
@@ -16,7 +16,6 @@ void SocketProxy::Run(const bool* shutdown)
 
   client_thread_.Join();
   server_thread_.Join();
-  shutdown_ = nullptr;
 }
 
 void SocketProxy::RecvFromClient()
@@ -34,7 +33,7 @@ void SocketProxy::SendRecv(Socket* client,
                            const std::vector<OnDataCallback>& recv_callbacks,
                            const std::vector<OnDataCallback>& send_callbacks)
 {
-  while(!shutdown_ && keep_running_)
+  while(!shutdown_() && keep_running_)
   {
     char buf[1024];
     try {
