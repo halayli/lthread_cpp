@@ -68,14 +68,21 @@ size_t Socket::Send(const char* buf, int timeout_ms)
   return Send(buf, strlen(buf), timeout_ms);
 }
 
+std::string Socket::Ip() const
+{
+
+  auto addr_info = (const struct sockaddr_in*)(&addr_);
+  char* tmp = inet_ntoa(addr_info->sin_addr);
+  return tmp;
+}
+
 std::string Socket::Desc() const
 {
   auto addr_info = (const struct sockaddr_in*)(&addr_);
-  char* tmp = inet_ntoa(addr_info->sin_addr);
   unsigned short port = htons(addr_info->sin_port);
 
   std::stringstream s;
-  s << tmp << ":" << port;
+  s << Ip() << ":" << port;
   return s.str();
 }
 

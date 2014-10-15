@@ -64,6 +64,7 @@ class Socket {
 
   bool IsConnected() const { return fd_ > -1; }
   int fd() const { return fd_; }
+  std::string Ip() const;
   std::string Desc() const;
 
  private:
