@@ -102,6 +102,7 @@ class Shell {
   ShellArgumentValueType GetShellArgumentValueType(const char* p) const;
   Shell(const Shell& that) = delete;
   bool shutdown() const { return shutdown_; }
+  void Stop() { shutdown_ = true; }
 
  private:
   Shell();
