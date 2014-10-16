@@ -68,7 +68,12 @@ void ShellClientHandler::Write(const std::string& output,
     final = "% " + output;
   if (newline)
     final += "\n";
-  client_.Send(final.c_str(), final.length(), 0);
+
+  try {
+    client_.Send(final.c_str(), final.length(), 0);
+  } catch (...) {
+    Close();
+  }
 }
 
 void ShellClientHandler::InvalidArgument(const std::string& desc)
@@ -91,12 +96,6 @@ void ShellClientHandler::Close()
 void ShellClientHandler::EnableConsole(void)
 {
   enable_console_ = true;
-}
-
-void ShellClientHandler::SendOk(void)
-{
-  std::string s = "Ok\n";
-  client_.Send(s.c_str(), s.length(), 0);
 }
 
 enum ParseState {
@@ -248,9 +247,12 @@ bool ShellClientHandler::ReadLine(char** line, int* len)
     }
 
     while (!shell_->shutdown()) {
-      int ret = client_.Recv(line_ + read_, kMaxLineLength - read_, 0);
-      read_ += ret;
-      break;
+      try {
+        read_ += client_.Recv(line_ + read_, kMaxLineLength - read_, 0);
+        break;
+      } catch (SocketTimeout& e) {
+        continue;
+      }
     }
 
   }
@@ -283,19 +285,31 @@ const ShellCommand* Shell::GetCommand(const std::string& command_name) const
   return &it->second;
 }
 
-void Shell::Listen()
+void Shell::Accept()
 {
+  cleaner_thread_ = Lthread{&Shell::Cleaner, this};
   while (!shutdown_) {
     try {
       Socket cli_socket = listener_.Accept();
-      clients_.push_back(Lthread(&Shell::HandleClient,
-                                 this,
-                                 std::move(cli_socket)));
-    } catch(SocketTimeout& e) {
-      continue;
+      clients_.push_back(Lthread{&Shell::HandleClient, this, std::move(cli_socket)});
     } catch(...) {
       break;
     }
+  }
+}
+
+void Shell::Cleaner()
+{
+  while (!shutdown_ || clients_.size()) {
+    for (auto it = clients_.begin(); it != clients_.end(); )
+      try {
+        it->Join(100);
+        it = clients_.erase(it);
+      } catch(Lthread::LthreadTimeout& e) {
+        ++it;
+      }
+
+    lthread_sleep(500);
   }
 }
 
@@ -303,7 +317,6 @@ void Shell::Listen()
 void Shell::HandleClient(Socket& client_socket)
 {
   ShellClientHandler client_shell(client_socket, this);
-  client_shell.SendOk();
   client_shell.Run();
 }
 
@@ -319,9 +332,8 @@ const std::string Shell::DescribeCommand(const std::string& cmd) const
 Shell::~Shell()
 {
   shutdown_ = true;
-  listener_thread_.Join();
-  for (auto& t : clients_)
-    t.Join();
+  acceptor_thread_.Join();
+  cleaner_thread_.Join();
 }
 
 Shell::Shell(const std::string& ip_address, uint16_t port)
@@ -393,7 +405,7 @@ void Shell::Start()
 
   listener_ = TcpListener(ip_address_, port_);
   listener_.Listen();
-  listener_thread_ = Lthread{&Shell::Listen, this};
+  acceptor_thread_ = Lthread{&Shell::Accept, this};
 }
 
 const std::string Shell::Help() {

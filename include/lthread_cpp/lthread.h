@@ -21,6 +21,8 @@ void LthreadExecute(void* arg);
 class Lthread
 {
  public:
+  class LthreadTimeout  {};
+
   typedef lthread_t*         native_handle_type;
   struct _Impl_base;
   typedef std::shared_ptr<_Impl_base>  __shared_base_type;
@@ -113,7 +115,7 @@ class Lthread
     }
   }
 
-  void Join();
+  void Join(uint64_t timeout_ms=0);
   void Detach();
   bool Joinable() const noexcept { return !(id_ == Id()); }
 

@@ -9,10 +9,13 @@ void Lthread::Detach()
   id_ = Id();
 }
 
-void Lthread::Join()
+void Lthread::Join(uint64_t timeout_ms)
 {
-  if (id_ != Id())
-    lthread_join(id_.lt_, nullptr, 0);
+  if (id_ != Id()) {
+    int r = lthread_join(id_.lt_, nullptr, timeout_ms);
+    if (r == -2)
+      throw LthreadTimeout();
+  }
 
   id_ = Id();
 }

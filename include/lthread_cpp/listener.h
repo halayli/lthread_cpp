@@ -1,6 +1,8 @@
 #ifndef LTHREAD_CPP_LISTENER_H
 #define LTHREAD_CPP_LISTENER_H
 
+#include <unistd.h>
+
 #include "lthread_cpp/socket.h"
 
 namespace lthread_cpp {
@@ -14,7 +16,7 @@ class TcpListener {
   {
     Close();
     if (fd_ != -1)
-      lthread_close(fd_);
+      close(fd_);
   }
   Socket Accept();
   void Listen();

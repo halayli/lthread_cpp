@@ -98,21 +98,26 @@ class Shell {
                        ShellCallback callback);
   void RegisterCallback(const std::string& mnemonic, MnemonicCallback callback);
   const ShellCommand* GetCommand(const std::string &command_name) const;
-  void HandleClient(Socket&);
   void Start();
-  ShellArgumentValueType GetShellArgumentValueType(const char* p) const;
+  void Stop() { shutdown_ = true; listener_.Close(); }
   Shell(const Shell& that) = delete;
   bool shutdown() const { return shutdown_; }
-  void Stop() { shutdown_ = true; listener_.Close(); }
+
+  ShellArgumentValueType GetShellArgumentValueType(const char* p) const;
 
  private:
   Shell();
+  void Cleaner();
   void Listen();
+  void Accept();
+  void HandleClient(Socket&);
+
   std::string ip_address_;
   uint16_t port_;
   std::unordered_map<std::string, ShellCommand> commands_;
   std::vector<Lthread> clients_;
-  Lthread listener_thread_;
+  Lthread acceptor_thread_;
+  Lthread cleaner_thread_;
   bool shutdown_;
   TcpListener listener_;
 };
@@ -133,7 +138,6 @@ class ShellClientHandler {
   void InvalidArgument(const std::string& desc);
   void CommandNotFound();
   void EnableConsole();
-  void SendOk();
   void Close();
   Shell* shell() const { return shell_; }
 
