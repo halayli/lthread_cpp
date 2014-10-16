@@ -12,15 +12,16 @@ TcpListener::TcpListener(const std::string& ip, short port)
 {
 }
 
-Socket TcpListener::Accept(int timeout_ms)
+Socket TcpListener::Accept()
 {
   struct sockaddr peer_addr = {0};
   socklen_t addrlen = sizeof(peer_addr);
 
   int cli_fd = lthread_accept(fd_, &peer_addr, &addrlen);
 
-  if (!cli_fd)
+  if (cli_fd == -1)
     throw SocketException("Accept failed: %s", strerror(errno));
+
   return Socket(cli_fd, &peer_addr, &addrlen);
 }
 
@@ -61,8 +62,6 @@ void TcpListener::Listen()
 
 void TcpListener::Close()
 {
-  if (fd_) {
-    lthread_close(fd_);
-    fd_ = -1;
-  }
+  if (fd_ != -1)
+    shutdown(fd_, SHUT_RD);
 }

@@ -14,8 +14,6 @@
 #include <map>
 #include <vector>
 
-#include "lthread_cpp/listener.h"
-
 static std::string shell_types[] = {
   std::string("string"),
   std::string("number"),
@@ -287,14 +285,14 @@ const ShellCommand* Shell::GetCommand(const std::string& command_name) const
 
 void Shell::Listen()
 {
-  TcpListener listener(ip_address_, port_);
-
   while (!shutdown_) {
     try {
-      Socket cli_socket = listener.Accept();
+      Socket cli_socket = listener_.Accept();
       clients_.push_back(Lthread(&Shell::HandleClient,
                                  this,
                                  std::move(cli_socket)));
+    } catch(SocketTimeout& e) {
+      continue;
     } catch(...) {
       break;
     }
@@ -392,6 +390,9 @@ bool Shell::RegisterCommand(const std::string& name,
 
 void Shell::Start()
 {
+
+  listener_ = TcpListener(ip_address_, port_);
+  listener_.Listen();
   listener_thread_ = Lthread{&Shell::Listen, this};
 }
 

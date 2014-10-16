@@ -8,9 +8,15 @@ namespace net{
 
 class TcpListener {
  public:
+  TcpListener() : fd_(-1) {}
   TcpListener(const std::string& ip, short port);
-  ~TcpListener() { Close(); }
-  Socket Accept(int timeout_ms=1000);
+  ~TcpListener()
+  {
+    Close();
+    if (fd_ != -1)
+      lthread_close(fd_);
+  }
+  Socket Accept();
   void Listen();
   void Close();
 

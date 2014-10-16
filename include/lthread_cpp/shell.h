@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "lthread_cpp/lthread.h"
+#include "lthread_cpp/listener.h"
 #include "lthread_cpp/socket.h"
 
 using namespace lthread_cpp;
@@ -102,7 +103,7 @@ class Shell {
   ShellArgumentValueType GetShellArgumentValueType(const char* p) const;
   Shell(const Shell& that) = delete;
   bool shutdown() const { return shutdown_; }
-  void Stop() { shutdown_ = true; }
+  void Stop() { shutdown_ = true; listener_.Close(); }
 
  private:
   Shell();
@@ -113,6 +114,7 @@ class Shell {
   std::vector<Lthread> clients_;
   Lthread listener_thread_;
   bool shutdown_;
+  TcpListener listener_;
 };
 
 class ShellClientHandler {
