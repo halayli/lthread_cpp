@@ -248,7 +248,7 @@ bool ShellClientHandler::ReadLine(char** line, int* len)
 
     while (!shell_->shutdown()) {
       try {
-        read_ += client_.Recv(line_ + read_, kMaxLineLength - read_, 0);
+        read_ += client_.Recv(line_ + read_, kMaxLineLength - read_, 1000);
         break;
       } catch (SocketTimeout& e) {
         continue;
