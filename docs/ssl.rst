@@ -1,13 +1,16 @@
 lthread_cpp::net::SSLSocket
 ===========================
 
+.. code-block:: cpp
+
+    #include <lthread_cpp/ssl.h>
+
+
 .. cpp:namespace:: lthread_cpp
 
 .. cpp:class:: SSLSocket
 
 Turns a :cpp:class:`Socket()` to :cpp:class:`SSLSocket()`
-
-`#include <lthread_cpp/ssl.h>`
 
 Member Functions
 ----------------
@@ -107,4 +110,3 @@ Member Functions
 	  // At this point, client can send/recv bytes over established SSL
           client.Send("hello world!\n");
 	}
-::

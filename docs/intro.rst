@@ -15,8 +15,6 @@ Installation & Linking
     cmake .
     sudo make install
 
-::
-
 Linking
 ^^^^^^^
 

@@ -1,11 +1,14 @@
 lthread_cpp::net::TcpListener
 =============================
 
+.. code-block:: cpp
+
+    #include <lthread_cpp/listener.h>
+
+
 .. cpp:namespace:: lthread_cpp
 
 .. cpp:class:: TcpListener
-
-`#include <lthread_cpp/listener.h>`
 
 Member Functions
 ----------------
@@ -51,4 +54,3 @@ Example
 	    t1.Detach();
 	  }
 	}
-::

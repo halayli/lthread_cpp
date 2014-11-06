@@ -1,11 +1,13 @@
 lthread_cpp::Lthread
 ====================
 
+.. code-block:: cpp
+
+    #include <lthread_cpp/lthread.h>
+
 .. cpp:class:: Lthread
 
 Launches a single lthread in the background.
-
-`#include <lthread_cpp/lthread.h>`
 
 Member Functions
 ----------------
@@ -42,6 +44,8 @@ Example
 
 .. code-block:: cpp
 
+    #include <lthread_cpp/lthread.h>
+
 	void MyMethod(std::vector<int> my_vec) {}
 
 	void Run()
@@ -53,4 +57,3 @@ Example
 
         Lthread{&Run};
         Lthread::Run();
-::

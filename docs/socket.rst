@@ -1,13 +1,16 @@
 lthread_cpp::net::Socket
 ========================
 
+.. code-block:: cpp
+
+    #include <lthread_cpp/socket.h>
+
+
 .. cpp:namespace:: lthread_cpp
 
 .. cpp:class:: Socket
 
 A wrapper around lthread's socket calls. `Socket` instance is returned by :cpp:class:`TcpConnect` and :cpp:class:`TcpListener` and cannot be constructed on its own.
-
-`#include <lthread_cpp/socket.h>`
 
 Member Functions
 ----------------
@@ -121,5 +124,3 @@ These functions reflect their lthread equivalent and are to be called from insid
      s.Recv(response, 1024);
      // s closes as it goes out of scope
     }
-
-::

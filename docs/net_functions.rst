@@ -1,6 +1,10 @@
 lthread_cpp::net
 ================
 
+.. code-block:: cpp
+
+    #include <lthread_cpp/socket.h>
+
 .. cpp:namespace:: lthread_cpp::net
 
 Functions & Exceptions
@@ -12,8 +16,7 @@ TcpConnect
 
     Connects to a remote host.
 
-
-    :param const std::string& host_or_ip: Host to connect to.
+    :param const std\:\:string& host_or_ip: Host to connect to.
     :param short port: Tcp port.
     :param int timeout_ms(1000): Milliseconds to wait connecting.
 
