@@ -5,6 +5,8 @@ lthread_cpp::net::TcpListener
 
 .. cpp:class:: TcpListener
 
+`#include <lthread_cpp/listener.h>`
+
 Member Functions
 ----------------
 

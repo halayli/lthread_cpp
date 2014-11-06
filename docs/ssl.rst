@@ -7,6 +7,8 @@ lthread_cpp::net::SSLSocket
 
 Turns a :cpp:class:`Socket()` to :cpp:class:`SSLSocket()`
 
+`#include <lthread_cpp/ssl.h>`
+
 Member Functions
 ----------------
 

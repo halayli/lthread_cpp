@@ -5,6 +5,8 @@ lthread_cpp::Lthread
 
 Launches a single lthread in the background.
 
+`#include <lthread_cpp/lthread.h>`
+
 Member Functions
 ----------------
 

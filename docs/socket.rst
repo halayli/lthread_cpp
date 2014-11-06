@@ -7,6 +7,8 @@ lthread_cpp::net::Socket
 
 A wrapper around lthread's socket calls. `Socket` instance is returned by :cpp:class:`TcpConnect` and :cpp:class:`TcpListener` and cannot be constructed on its own.
 
+`#include <lthread_cpp/socket.h>`
+
 Member Functions
 ----------------
 

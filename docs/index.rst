@@ -3,6 +3,7 @@ User Documentation
 
 .. toctree::
 
+    intro
     lthread
     net_functions
     socket
