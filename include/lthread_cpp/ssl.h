@@ -18,7 +18,7 @@ class SSLSocket : public Socket {
   SSLSocket(Socket&& s);
   size_t Send(const char* buf, int timeout_ms=5000);
   size_t Send(const char* buf, size_t length, int timeout_ms=5000);
-  size_t Recv(char* buf, size_t length, int timeout_ms=1000);
+  size_t Recv(char* buf, size_t length, int timeout_ms=5000);
   void Close();
 
   static void Init(const std::string& server_pem_filename,

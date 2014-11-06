@@ -1,77 +1,123 @@
 lthread_cpp::net::Socket
-------------------------
+========================
+
+.. cpp:namespace:: lthread_cpp
 
 .. cpp:class:: Socket
 
-A wrapper around lthread's socket calls. `Socket` instance is returned by [TcpConnect](socket.md#tcp-connect) and [TcpListener::Accept](listener.md) and cannot be constructed on its own.
+A wrapper around lthread's socket calls. `Socket` instance is returned by :cpp:class:`TcpConnect` and :cpp:class:`TcpListener` and cannot be constructed on its own.
 
 Member Functions
-================
+----------------
 
 These functions reflect their lthread equivalent and are to be called from inside lthreads.
 
 .. cpp:function:: size_t Send(const char* buf)
 
-   Sends a C-style string over a socket. This is a convenience function to avoid calling strlen() on `buf`.
+    Sends a C-style string over a socket.
+
+    :param const char* buf: NULL-terminated buffer.
+
+    :return: Number of bytes sent.
+    :throws: :cpp:class:`SocketException()` on socket failure.
 
 .. cpp:function:: size_t Send(const char* buf, size_t length)
 
-   Sends `length` bytes over a socket.
+    Sends `length` bytes over a socket.
+
+    :param const char\* buf: Ptr to buffer containing data to send.
+    :param size_t length: Number of bytes to send from `buf`.
+
+    :return: Number of bytes sent.
+    :throws: :cpp:class:`SocketException()` on socket failure.
 
 .. cpp:function:: size_t Recv(char* buf, size_t length, int timeout_ms=1000)
 
-   Receives upto `length` bytes over a socket. Throws a `SocketTimeout` exception if a timeout occured. `timeout_ms=0` waits indefinitely.
+    Receives up to `length` bytes over a socket.
+
+    :param char* buf: Buffer to read data into.
+    :param size_t length: Buffer size to fill.
+    :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
+
+    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketTimeout()` if a timeout occured. `timeout_ms=0` waits indefinitely.
 
 .. cpp:function:: void Close()
 
-   Closes the network socket.
+    Closes the network socket.
 
 .. cpp:function:: Writev(struct iovec* v, int iovcnt)
 
-   Sends an iovec over a socket
+    Sends an iovec over a socket.
+
+    :param struct iovec* v: iovec pointing to one or more ptr/size entries.
+    :param int iovcnt: Number of entries in the iovec.
+
+    :throws: :cpp:class:`SocketException()` on socket failure.
 
 .. cpp:function:: RecvExact(char* buf, size_t length, int timeout_ms=1000)
 
-   Receives `length` bytes or throws `SocketTimeout` exception if it timed out before receiving the full number of bytes.
+    Receives exactly `length` bytes into buf.
+
+    :param char* buf: Buffer to read data into.
+    :param size_t length: Buffer size to fill.
+    :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
+
+    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketTimeout()` if it timed out before receiving the full number of bytes.
 
 .. cpp:function:: WaitWrite(int timeout_ms=1000) const
 
-   Waits until the socket is writable. throws `SocketTimeout` exception if timeout occured.
+    Waits until the socket is writable.
+
+    :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
+
+    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketTimeout()` if timeout occured.
 
 .. cpp:function:: WaitRead(int timeout_ms=1000) const
 
-   Waits until the socket is readable. throws `SocketTimeout` exception if timeout occured.
+    Waits until the socket is readable.
+
+    :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
+
+    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketTimeout()` if timeout occured.
 
 .. cpp:function:: bool IsConnected() const
 
-   Returns true if socket is connected.
+    Returns true if socket is connected.
 
 .. cpp:function:: int fd() const
 
-   Returns the fd wrapped in the `Socket` instance
+    Returns the fd wrapped in the :cpp:class:`Socket()` instance.
 
 .. cpp:function:: std::string Ip() const
 
-   Returns the remote IP Address as a string
+    Returns the remote IP Address as a string.
+
+    :return: string containing IP address.
 
 .. cpp:function:: std::string Desc() const
 
-   Returns remote_ip:ephemeral_port as a string
+    Returns remote_ip:ephemeral_port as a string
 
 .. cpp:function:: Socket& operator=(Socket&& rr_c)
 
-   Moves a socket from one instance to another.
+    Moves a socket from one instance to another.
 
 .. note:: Socket objects are not copyable
 
 .. code-block:: cpp
-	void Run()
-	{
-	  Socket s = TcpConnect("127.0.0.1", 80);
-	  s.Send("GET / HTTP/1.1\r\n\r\n");
 
-	  char response[1024];
-	  s.Recv(response, 1024);
-	  // s closes as it goes out of scope
-	}
+    void Run()
+    {
+     Socket s = TcpConnect("127.0.0.1", 80);
+     s.Send("GET / HTTP/1.1\r\n\r\n");
+
+     char response[1024];
+     s.Recv(response, 1024);
+     // s closes as it goes out of scope
+    }
+
 ::

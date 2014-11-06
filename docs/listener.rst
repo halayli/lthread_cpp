@@ -1,12 +1,12 @@
 lthread_cpp::net::TcpListener
----------------------
+=============================
+
+.. cpp:namespace:: lthread_cpp
 
 .. cpp:class:: TcpListener
 
 Member Functions
-================
-
-.. cpp:namespace:: lthread_cpp
+----------------
 
 .. cpp:function:: TcpListener(const std::string& ip, short port)
 
@@ -14,17 +14,28 @@ Member Functions
 
 .. cpp:function:: void Listen()
 
-   Binds IP and port. Can throw `SocketException` if it fails to bind or listen.
+   Binds IP and port to socket.
+
+   :throws: :cpp:class:`SocketException()` if it fails to bind or listen.
 
 .. cpp:function:: Socket Accept()
 
-   Accepts a new connection and returns a new Socket object. Can throw `SocketException` if `lthread_accept` failed.
+    Blocks until a new connection is accepted.
+
+    :return: A new :cpp:class:`Socket` object for the new connection.
+
+    :throws: :cpp:class:`SocketException()` if `lthread_accept()` failed.
+
 
 .. cpp:function:: void Close()
 
    Closes listening port.
 
+
 .. note:: TcpListener objects are not copyable
+
+Example
+-------
 
 .. code-block:: cpp
 

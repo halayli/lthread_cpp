@@ -1,57 +1,81 @@
 lthread_cpp::net::SSLSocket
----------------------------
+===========================
+
+.. cpp:namespace:: lthread_cpp
 
 .. cpp:class:: SSLSocket
 
-Turns a :cpp:class:`Socket` to :cpp:class:`SSLSocket`
+Turns a :cpp:class:`Socket()` to :cpp:class:`SSLSocket()`
 
 Member Functions
-================
-
-.. cpp:function:: SSLSocket(Socket && s)
-
-Initializes/wraps a new SSLSocket from an existing established :cpp:class:`Socket`.
-
-.. cpp:function:: SSLSocket()
-
-Initializes an new SSLSocket ready to connect to peer using :cpp:class:`SSLSocket::Connect()`.
+----------------
 
 .. cpp:function:: static void Init(const std::string& server_pem_filename, const std::string& server_key_filename, const std::string& ca_cert_filename, const std::string& ca_path)
 
-   Initializes SSL settings. Must be called once before any SSLSocket connection is received or established. Throws `SSLException` if it failed to initialize SSL Ctx with any of the value
-s provided.
+    Initializes SSL settings. Must be called once before any SSLSocket connection is received or established.
 
-.. cpp:function:: Accept(int timeout_ms=5000)
+    :throws: :cpp:class:`SSLException()` if it failed to initialize SSL context with any of the values provided.
 
-   Initiates an SSL Accept with the assumption that the TCP connection was accept(2)-ed and not established via connect(2). Throws `SSLException` if ssl accept failed.
+.. cpp:function:: SSLSocket(Socket && s)
 
-.. cpp:function:: Connect(const std::string& host_or_ip, short port, int timeout_ms)
+    Initializes/wraps a new SSLSocket from an existing established :cpp:class:`Socket`.
 
-   Establishes a TCP connection to host/ip:port and initiates an SSL Connect afterwards. Throws `SSLException` if SSL connect failed or `SocketExcpetion` if TCP connect failed.
+.. cpp:function:: SSLSocket()
 
-.. cpp:function:: RequirePeerVerification()
+    Initializes an new SSLSocket ready to connect to peer using :cpp:class:`SSLSocket::Connect()`.
 
-   Will set SSL peer verification flag on.
+.. cpp:function:: void Accept(int timeout_ms=5000)
+
+    Initiates an SSL Accept with the assumption that the TCP connection was accept(2)-ed and not established via connect(2).
+
+    :throws: :cpp:class:`SSLException()` if ssl accept failed.
+
+.. cpp:function:: void Connect(const std::string& host_or_ip, short port, int timeout_ms)
+
+    Establishes a TCP connection to host/ip:port and initiates an SSL Connect afterwards.
+
+    :throws: :cpp:class:`SSLException()` if SSL connect failed
+    :throws: :cpp:class:`SocketException()` on socket failure.
+
+.. cpp:function:: void RequirePeerVerification()
+
+    Will set SSL peer verification flag on.
 
 .. cpp:function:: std::string GetCertCommonName()
 
-   Returns common name in certificate received.
+    Returns common name in certificate received.
 
 .. cpp:function:: size_t Send(const char* buf, int timeout_ms=5000)
 
-   Sends a C style string over SSL socket. buf must be null-terminated. Throws `SSLException` if it failed.
+    Sends a C style string over SSL socket.
+
+    :param const char* buf: NULL-terminated buffer.
+
+    :throws: :cpp:class:`SSLException()` on socket failure.
 
 .. cpp:function:: size_t Send(const char* buf, size_t length, int timeout_ms=5000)
-   
-   Sends length bytes of buf over SSL socket. Throws `SSLException` if send failed.
 
-.. cpp:function:: size_t Recv(char* buf, size_t length, int timeout_ms=1000)
+    Sends length bytes of buf over SSL socket.
 
-   Receives up to length bytes and place them into buf. Throws `SSLException` if it failed.
+    :param const char\* buf: Ptr to buffer containing data to send.
+    :param size_t length: Number of bytes to send from `buf`.
+    :param timeout_ms(optional, default=5000): Milliseconds to wait before timing out.
+
+    :throws: :cpp:class:`SSLException()` on socket failure.
+
+.. cpp:function:: size_t Recv(char* buf, size_t length, int timeout_ms=5000)
+
+    Receives up to length bytes and place them into buf.
+
+    :param char* buf: Buffer to read data into.
+    :param size_t length: Buffer size to fill.
+    :param timeout_ms(optional, default=5000): Milliseconds to wait before timing out.
+
+    :throws: :cpp:class:`SSLException()` on socket failure.
 
 .. cpp:function:: void Close()
 
-   Cleanly closes SSL socket and it's underlying TCP connection.
+    Cleanly closes SSL socket and its underlying TCP connection.
 
 .. note:: Lthread objects are not copyable
 

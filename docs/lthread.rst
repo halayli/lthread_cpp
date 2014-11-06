@@ -1,12 +1,12 @@
 lthread_cpp::Lthread
----------------------
+====================
 
 .. cpp:class:: Lthread
 
 Launches a single lthread in the background.
 
 Member Functions
-================
+----------------
 
 .. cpp:function:: Lthread()
 
@@ -34,6 +34,9 @@ Creates new `lthread` object and associates it with an lthread. The constructor 
 
 
 .. note:: Lthread objects are not copyable
+
+Example
+-------
 
 .. code-block:: cpp
 

@@ -2,9 +2,9 @@ User Documentation
 ------------------
 
 .. toctree::
-    :maxdepth: 2
 
     lthread
+    net_functions
     socket
     listener
     ssl
