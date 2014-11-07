@@ -127,22 +127,4 @@ SocketException
 
     Inherits std::exception(), raised on socket errors.
 
-Examples
---------
-
-.. code-block:: cpp
-
-    using namespace lthread;
-    using namespace lthread::net;
-
-    void Run()
-    {
-     Socket s = TcpConnect("127.0.0.1", 80);
-     s.Send("GET / HTTP/1.1\r\n\r\n");
-
-     char response[1024];
-     s.Recv(response, 1024);
-     // s closes as it goes out of scope
-    }
-
 

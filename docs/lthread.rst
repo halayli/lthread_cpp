@@ -57,21 +57,27 @@ Example
 
 .. code-block:: cpp
 
+    #include <vector>
     #include <lthread_cpp/lthread.h>
 
-    using namespace lthread;
+    using namespace lthread_cpp;
 
     void MyMethod(std::vector<int> my_vec) {}
 
     void Run()
     {
-  	     std::vector<int> v{1,2,3,4};
-  	     Lthread t1{&MyMethod, v};
-  	     t1.Detach();
+      std::vector<int> v{1,2,3,4};
+      Lthread t1{&MyMethod, v};
+      t1.Detach();
     }
 
     int main()
     {
-        Lthread{&Run};
-        Lthread::Run();
+      Lthread t{&Run};
+      t.Detach();
+      Lthread::Run();
     }
+
+.. code-block:: shell
+
+    cc -std=c++11 test.cc -o test -llthread_cpp -llthread -lpthread -lstdc++ && ./test

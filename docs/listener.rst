@@ -39,12 +39,21 @@ Examples
 --------
 .. code-block:: cpp
 
-    using namespace lthread;
-    using namespace lthread::net;
+    #include <lthread_cpp/lthread.h>
+    #include <lthread_cpp/socket.h>
+    #include <lthread_cpp/listener.h>
+
+    using namespace lthread_cpp;
+    using namespace lthread_cpp::net;
+
+    void HandleConnection(Socket& s)
+    {
+      s.Send("Hi");
+    }
 
     void Run()
     {
-      TcpListener listener("127.0.0.0", 8090);
+      TcpListener listener("127.0.0.1", 8090);
       listener.Listen();
       while (1) {
         Socket s = listener.Accept();
@@ -52,3 +61,14 @@ Examples
         t1.Detach();
       }
     }
+
+    int main()
+    {
+        Lthread t{&Run};
+        t.Detach();
+        Lthread::Run();
+    }
+
+.. code-block:: shell
+
+    cc -std=c++11 test.cc -o test -llthread_cpp -llthread -lpthread -lstdc++ && ./test
