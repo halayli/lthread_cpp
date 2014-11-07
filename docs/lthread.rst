@@ -20,24 +20,27 @@ Member Functions
 
 Creates new `lthread` object and associates it with an lthread. The constructor copies/moves all arguments args... to an lthread-accessible storage.
 
-.. cpp:function:: Join()
+.. cpp:function:: Join(uint64_t timeout_ms)
 
    Joins on a single lthread and blocks until the lthread returns.
 
-.. cpp:function:: Detach()
+   :param timeout_ms(optional, default=0): Milliseconds to wait joining on another lthread.
+   :throws: :cpp:class:`LthreadTimeout()` on timeout.
+
+.. cpp:function:: void Detach()
 
    Marks the lthread launched as detachable to be freed upon return. This is a direct binding to `lthread_detach`
 
-.. cpp:function:: Id()
+.. cpp:function:: lthread_t* Id()
 
-   Returns an lthread_t* ptr pointing to the original lthread created by `lthread_create`
+   :return: an lthread_t* ptr pointing to the original lthread created by `lthread_create`
 
-.. cpp:function:: Joinable()
+.. cpp:function:: bool Joinable()
 
-   Returns `true` if the lthread can be joined on(i.e., launched)
+   :return: `true` if the lthread can be joined on(i.e., launched)
 
 
-.. note:: Lthread objects are not copyable
+.. note:: Lthread objects are movable but not copyable.
 
 Example
 -------
@@ -46,14 +49,17 @@ Example
 
     #include <lthread_cpp/lthread.h>
 
-	void MyMethod(std::vector<int> my_vec) {}
+    void MyMethod(std::vector<int> my_vec) {}
 
-	void Run()
-	{
-	  std::vector<int> v{1,2,3,4};
-	  Lthread t1{&MyMethod, v};
-	  t1.Detach();
-	}
+    void Run()
+    {
+  	     std::vector<int> v{1,2,3,4};
+  	     Lthread t1{&MyMethod, v};
+  	     t1.Detach();
+    }
 
+    int main()
+    {
         Lthread{&Run};
         Lthread::Run();
+    }

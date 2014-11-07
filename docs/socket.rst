@@ -111,7 +111,7 @@ These functions reflect their lthread equivalent and are to be called from insid
 
     Moves a socket from one instance to another.
 
-.. note:: Socket objects are not copyable
+.. note:: Socket objects are movable but not copyable.
 
 .. code-block:: cpp
 

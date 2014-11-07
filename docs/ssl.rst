@@ -82,7 +82,7 @@ Member Functions
 
     Cleanly closes SSL socket and its underlying TCP connection.
 
-.. note:: Lthread objects are not copyable
+.. note:: SSL objects are movable but not copyable.
 
 .. code-block:: cpp
 

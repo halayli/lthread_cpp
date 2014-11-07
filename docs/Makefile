@@ -49,6 +49,9 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
+livehtml:
+	sphinx-autobuild -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+
 auto:
 	sphinx-autobuild -p 8888 $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
