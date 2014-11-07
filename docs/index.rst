@@ -5,9 +5,9 @@ User Documentation
 
     intro
     lthread
-    net_functions
     socket
     listener
+    tcp_connect
     ssl
 
 .. _feature-docs:

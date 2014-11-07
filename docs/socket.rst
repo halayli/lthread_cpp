@@ -1,21 +1,19 @@
-lthread_cpp::net::Socket
-========================
+Socket
+======
 
 .. code-block:: cpp
 
     #include <lthread_cpp/socket.h>
-
-
-.. cpp:namespace:: lthread_cpp
+    using namespace lthread::net;
 
 .. cpp:class:: Socket
 
-A wrapper around lthread's socket calls. `Socket` instance is returned by :cpp:class:`TcpConnect` and :cpp:class:`TcpListener` and cannot be constructed on its own.
+A wrapper around lthread's socket calls. `Socket` instance is returned by :cpp:func:`TcpConnect` and :cpp:class:`TcpListener` and cannot be constructed on its own.
 
 Member Functions
 ----------------
 
-These functions reflect their lthread equivalent and are to be called from inside lthreads.
+These functions reflect their lthread equivalent and must be called inside lthreads.
 
 .. cpp:function:: size_t Send(const char* buf)
 
@@ -24,7 +22,7 @@ These functions reflect their lthread equivalent and are to be called from insid
     :param const char* buf: NULL-terminated buffer.
 
     :return: Number of bytes sent.
-    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketException` on socket failure.
 
 .. cpp:function:: size_t Send(const char* buf, size_t length)
 
@@ -34,7 +32,7 @@ These functions reflect their lthread equivalent and are to be called from insid
     :param size_t length: Number of bytes to send from `buf`.
 
     :return: Number of bytes sent.
-    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketException` on socket failure.
 
 .. cpp:function:: size_t Recv(char* buf, size_t length, int timeout_ms=1000)
 
@@ -44,23 +42,23 @@ These functions reflect their lthread equivalent and are to be called from insid
     :param size_t length: Buffer size to fill.
     :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
 
-    :throws: :cpp:class:`SocketException()` on socket failure.
-    :throws: :cpp:class:`SocketTimeout()` if a timeout occured. `timeout_ms=0` waits indefinitely.
+    :throws: :cpp:class:`SocketException` on socket failure.
+    :throws: :cpp:class:`SocketTimeout` if a timeout occured. `timeout_ms=0` waits indefinitely.
 
 .. cpp:function:: void Close()
 
     Closes the network socket.
 
-.. cpp:function:: Writev(struct iovec* v, int iovcnt)
+.. cpp:function:: size_t Writev(struct iovec* v, int iovcnt)
 
     Sends an iovec over a socket.
 
     :param struct iovec* v: iovec pointing to one or more ptr/size entries.
     :param int iovcnt: Number of entries in the iovec.
 
-    :throws: :cpp:class:`SocketException()` on socket failure.
+    :throws: :cpp:class:`SocketException` on socket failure.
 
-.. cpp:function:: RecvExact(char* buf, size_t length, int timeout_ms=1000)
+.. cpp:function:: size_t RecvExact(char* buf, size_t length, int timeout_ms=1000)
 
     Receives exactly `length` bytes into buf.
 
@@ -68,26 +66,26 @@ These functions reflect their lthread equivalent and are to be called from insid
     :param size_t length: Buffer size to fill.
     :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
 
-    :throws: :cpp:class:`SocketException()` on socket failure.
-    :throws: :cpp:class:`SocketTimeout()` if it timed out before receiving the full number of bytes.
+    :throws: :cpp:class:`SocketException` on socket failure.
+    :throws: :cpp:class:`SocketTimeout` if it timed out before receiving the full number of bytes.
 
-.. cpp:function:: WaitWrite(int timeout_ms=1000) const
+.. cpp:function:: void WaitWrite(int timeout_ms=1000) const
 
     Waits until the socket is writable.
 
     :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
 
-    :throws: :cpp:class:`SocketException()` on socket failure.
-    :throws: :cpp:class:`SocketTimeout()` if timeout occured.
+    :throws: :cpp:class:`SocketException` on socket failure.
+    :throws: :cpp:class:`SocketTimeout` if timeout occured.
 
-.. cpp:function:: WaitRead(int timeout_ms=1000) const
+.. cpp:function:: void WaitRead(int timeout_ms=1000) const
 
     Waits until the socket is readable.
 
     :param timeout_ms(optional, default=1000): Milliseconds to wait before timing out.
 
-    :throws: :cpp:class:`SocketException()` on socket failure.
-    :throws: :cpp:class:`SocketTimeout()` if timeout occured.
+    :throws: :cpp:class:`SocketException` on socket failure.
+    :throws: :cpp:class:`SocketTimeout` if timeout occured.
 
 .. cpp:function:: bool IsConnected() const
 
@@ -95,7 +93,7 @@ These functions reflect their lthread equivalent and are to be called from insid
 
 .. cpp:function:: int fd() const
 
-    Returns the fd wrapped in the :cpp:class:`Socket()` instance.
+    Returns the fd wrapped in the :cpp:class:`Socket` instance.
 
 .. cpp:function:: std::string Ip() const
 
@@ -111,9 +109,31 @@ These functions reflect their lthread equivalent and are to be called from insid
 
     Moves a socket from one instance to another.
 
+
 .. note:: Socket objects are movable but not copyable.
 
+Exceptions
+----------
+
+SocketTimeout
+^^^^^^^^^^^^^
+.. cpp:class:: SocketTimeout
+
+    Empty class raised on socket timeout operations.
+
+SocketException
+^^^^^^^^^^^^^^^
+.. cpp:class:: SocketException
+
+    Inherits std::exception(), raised on socket errors.
+
+Examples
+--------
+
 .. code-block:: cpp
+
+    using namespace lthread;
+    using namespace lthread::net;
 
     void Run()
     {
@@ -124,3 +144,5 @@ These functions reflect their lthread equivalent and are to be called from insid
      s.Recv(response, 1024);
      // s closes as it goes out of scope
     }
+
+

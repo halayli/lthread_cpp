@@ -1,9 +1,10 @@
-lthread_cpp::Lthread
-====================
+Lthread
+=======
 
 .. code-block:: cpp
 
     #include <lthread_cpp/lthread.h>
+    using namespace lthread;
 
 .. cpp:class:: Lthread
 
@@ -42,12 +43,23 @@ Creates new `lthread` object and associates it with an lthread. The constructor 
 
 .. note:: Lthread objects are movable but not copyable.
 
+Exceptions
+----------
+
+LthreadTimeout
+^^^^^^^^^^^^^^
+.. cpp:class:: LthreadTimeout
+
+    Empty class raised on Lthread `join` timeout call.
+
 Example
 -------
 
 .. code-block:: cpp
 
     #include <lthread_cpp/lthread.h>
+
+    using namespace lthread;
 
     void MyMethod(std::vector<int> my_vec) {}
 

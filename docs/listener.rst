@@ -1,12 +1,11 @@
-lthread_cpp::net::TcpListener
-=============================
+TcpListener
+===========
 
 .. code-block:: cpp
 
     #include <lthread_cpp/listener.h>
 
-
-.. cpp:namespace:: lthread_cpp
+    using namespace lthread_cpp::net;
 
 .. cpp:class:: TcpListener
 
@@ -21,7 +20,7 @@ Member Functions
 
    Binds IP and port to socket.
 
-   :throws: :cpp:class:`SocketException()` if it fails to bind or listen.
+   :throws: :cpp:class:`SocketException` if it fails to bind or listen.
 
 .. cpp:function:: Socket Accept()
 
@@ -29,28 +28,27 @@ Member Functions
 
     :return: A new :cpp:class:`Socket` object for the new connection.
 
-    :throws: :cpp:class:`SocketException()` if `lthread_accept()` failed.
+    :throws: :cpp:class:`SocketException` if `lthread_accept()` failed.
 
 
 .. cpp:function:: void Close()
 
    Closes listening port.
 
-
-.. note:: TcpListener objects are not copyable
-
-Example
--------
-
+Examples
+--------
 .. code-block:: cpp
 
-	void Run()
-	{
-	  TcpListener listener("127.0.0.0", 8090);
-	  listener.Listen();
-	  while (1) {
-	    Socket s = listener.Accept();
-	    Lthread t1 {&HandleConnection, std::move(s)};
-	    t1.Detach();
-	  }
-	}
+    using namespace lthread;
+    using namespace lthread::net;
+
+    void Run()
+    {
+      TcpListener listener("127.0.0.0", 8090);
+      listener.Listen();
+      while (1) {
+        Socket s = listener.Accept();
+        Lthread t1 {&HandleConnection, std::move(s)};
+        t1.Detach();
+      }
+    }
