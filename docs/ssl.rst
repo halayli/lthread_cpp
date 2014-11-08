@@ -23,11 +23,12 @@ Member Functions
 
 .. cpp:function:: SSLSocket(Socket && s)
 
-    Initializes/wraps a new SSLSocket from an existing established :cpp:class:`Socket`.
+    Initializes/wraps a new SSLSocket from an existing established :cpp:class:`Socket`. Requires calling either :cpp:func:`SSLSocket::Accept` or :cpp:func:`SSLSocket::Connect` afterwards depending on whether the underlying TCP connection was accepted by the listener using :cpp:func:`Accept` or established via :cpp:func:`TcpConnect`.
+
 
 .. cpp:function:: SSLSocket()
 
-    Initializes an new SSLSocket ready to connect to peer using :cpp:class:`SSLSocket::Connect()`.
+    Initializes n new SSLSocket ready to connect to peer using :cpp:class:`SSLSocket::Connect()`.
 
 .. cpp:function:: void Accept(int timeout_ms=5000)
 
